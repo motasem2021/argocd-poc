@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/sro-net: "true"
+    io.kompose.service: api-v3
+  name: api-v3
+spec:
+  containers:
+    - env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Docker
+        - name: ASPNETCORE_URLS
+          value: http://0.0.0.0:80
+        - name: "FileSystembasePath"
+          value: "/srv/sro"
+        - name: SRO_VERSION
+          value: "12"
+      image: sro-registry:5000/sro_api-v3:latest
+      livenessProbe:
+        exec:
+          command:
+            - curl
+            - -f
+            - http://localhost:80/hc
+        failureThreshold: 5
+        periodSeconds: 20
+        timeoutSeconds: 3
+      name: sro-api-v3
+      ports:
+        - containerPort: 80
+      resources: {}
+      volumeMounts:
+        - mountPath: /srv/sro
+          name: api-v3-claim0
+  restartPolicy: OnFailure
+  volumes:
+    - name: api-v3-claim0
+      persistentVolumeClaim:
+        claimName: api-v3-claim0
+status: {}

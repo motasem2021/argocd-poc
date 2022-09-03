@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/sro-net: "true"
+    io.kompose.service: dss
+  name: dss
+spec:
+  containers:
+    - env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Docker
+        - name: ASPNETCORE_URLS
+          value: http://0.0.0.0:80
+        - name: SRO_VERSION
+        - name: dssListener__address
+          value: host.docker.internal
+      image: sro-registry:5000/sro_dss:latest
+      livenessProbe:
+        exec:
+          command:
+            - curl
+            - -f
+            - http://localhost:80/hc
+        failureThreshold: 5
+        periodSeconds: 20
+        timeoutSeconds: 3
+      name: sro-dss
+      resources: {}
+      volumeMounts:
+        - mountPath: /srv/sro
+          name: dss-claim0
+  restartPolicy: OnFailure
+  volumes:
+    - name: dss-claim0
+      persistentVolumeClaim:
+        claimName: dss-claim0
+status: {}

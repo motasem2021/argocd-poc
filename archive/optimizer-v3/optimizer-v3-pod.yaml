@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/sro-net: "true"
+    io.kompose.service: optimizer-v3
+  name: optimizer-v3
+spec:
+  containers:
+    - env:
+        - name: IS_DOCKER
+          value: "1"
+        - name: LOG_DIR
+          value: /srv/sro/Logs/optimizer
+        - name: PHZR_SRO_LOCALSOLVER_LICENSE_KEY
+          value: "5DC3-BA9C-E7321227-6CF7-60A5EF97408384DA-1D30208B36204986-F20D-1D37-AFF6"
+        - name: PHZR_SRO_RABBITMQ_HOST
+          value: "10.43.133.212"
+        - name: PHZR_SRO_RABBITMQ_PASSWORD
+          value: sro-dev
+        - name: PHZR_SRO_RABBITMQ_PORT
+          value: "5672"
+        - name: PHZR_SRO_RABBITMQ_USERNAME
+          value: sro-dev
+        - name: SRO_VERSION
+          value: "3"
+        - name: USE_RICH_LOGGING
+          value: "0"
+      image: sro-registry:5000/optimizer-v3:latest
+      livenessProbe:
+        exec:
+          command:
+            - curl
+            - -f
+            - http://localhost:80/hc
+        failureThreshold: 5
+        periodSeconds: 20
+        timeoutSeconds: 3
+      name: sro-optimizer-v3
+      resources: {}
+      volumeMounts:
+        - mountPath: /srv/sro
+          name: optimizer-v3-claim0
+  restartPolicy: OnFailure
+  volumes:
+    - name: optimizer-v3-claim0
+      persistentVolumeClaim:
+        claimName: optimizer-v3-claim0
+status: {}

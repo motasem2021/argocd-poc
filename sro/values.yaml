@@ -1,0 +1,46 @@
+### Global Values if any ###
+global: {}
+
+### Sub Charts Specific Values ###
+# Portal
+api:
+  enabled: true
+  image:
+    version:
+# Customer Management
+api-v3:
+  enabled: true
+  image:
+    version:
+# Product Catalog
+dss:
+  enabled: true
+  image:
+    version:
+# Order Management
+integration:
+  enabled: false
+  image:
+    version:
+# Order History
+mongo:
+  enabled: true
+  image:
+    version:
+# Payment Solution
+optimizer:
+  enabled: true
+  image:
+    version:
+optimizer-v3:
+  enabled: true
+  image:
+    version:
+preprocessing:
+  enabled: true
+  image:
+    version:
+rabbitmq:
+  enabled: true
+  image:
+    version:

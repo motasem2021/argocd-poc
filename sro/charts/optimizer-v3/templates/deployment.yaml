@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "optimizer-v3.fullname" . }}
+  labels:
+    {{- include "optimizer-v3.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "optimizer-v3.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "optimizer-v3.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "optimizer-v3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: IS_DOCKER
+              value: "1"
+            - name: LOG_DIR
+              value: /srv/sro/Logs/optimizer
+            - name: PHZR_SRO_LOCALSOLVER_LICENSE_KEY
+              value: "5DC3-BA9C-E7321227-6CF7-60A5EF97408384DA-1D30208B36204986-F20D-1D37-AFF6"
+            - name: PHZR_SRO_RABBITMQ_HOST
+              value: "rabbitmq.default.svc.cluster.local"
+            - name: PHZR_SRO_RABBITMQ_PASSWORD
+              value: sro-dev
+            - name: PHZR_SRO_RABBITMQ_PORT
+              value: "5672"
+            - name: PHZR_SRO_RABBITMQ_USERNAME
+              value: sro-dev
+            - name: SRO_VERSION
+              value: "3"
+            - name: USE_RICH_LOGGING
+              value: "0"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

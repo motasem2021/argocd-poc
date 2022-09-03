@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/sro-net: "true"
+    io.kompose.service: mongo
+  name: mongo
+spec:
+  containers:
+    - args:
+        - mongod
+        - --quiet
+      env:
+        - name: MONGO_INITDB_DATABASE
+          value: sro-db
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: mongo-user
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: mongo-user
+      image: sro-registry:5000/mongo:latest
+      livenessProbe:
+        exec:
+          command:
+            - echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+        failureThreshold: 3
+        periodSeconds: 30
+        timeoutSeconds: 30
+      name: sro-mongo
+      ports:
+        - containerPort: 27017
+      resources: {}
+      volumeMounts:
+        - mountPath: /data/db
+          name: mongo-claim0
+  restartPolicy: OnFailure
+  volumes:
+    - name: mongo-claim0
+      persistentVolumeClaim:
+        claimName: mongo-claim0
+status: {}
