@@ -1,0 +1,45 @@
+apiVersion: v2
+name: pr-project-1
+description: A Parent Helm chart for Kubernetes
+type: application
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates
+version: 0.1.0
+
+# versions needs to be changed, whenever corresponding the sub chart versions are changing
+dependencies:
+- name: api
+  repository: file://charts/api
+  version: 0.1.0
+  condition: api.enabled
+- name: api-v3
+  repository: file://charts/api-v3
+  version: 0.1.0
+  condition: api-v3.enabled
+- name: dss
+  repository: file://charts/dss
+  version: 0.1.0
+  condition: dss.enabled
+- name: integration
+  repository: file://charts/integration
+  condition: integration.enabled
+- name: mongo
+  repository: file://charts/mongo
+  version: 0.1.0
+  condition: mongo.enabled
+- name: optimizer
+  repository: file://charts/optimizer
+  version: 0.1.0
+  condition: optimizer.enabled
+- name: optimizer-v3
+  repository: file://charts/optimizer-v3
+  version: 0.1.0
+  condition: optimizer-v3.enabled
+- name: preprocessing
+  repository: file://charts/preprocessing
+  version: 0.1.0
+  condition: preprocessing.enabled
+- name: rabbitmq
+  repository: file://charts/rabbitmq
+  version: 0.1.0
+  condition: rabbitmq.enabled
